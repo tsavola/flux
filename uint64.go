@@ -2,47 +2,42 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package threshold
+package flux
 
 import (
 	"sync/atomic"
 )
 
-// Uint64 threshold.
+// Uint64 value in flux.
 type Uint64 struct {
+	value uint64 // Atomic.
 	Waker
-	value uint64
 }
 
-// MakeUint64 is for initializing a field.  Multiple copies of the struct
-// value must not be used.
+// MakeUint64 is for initializing a field.  Multiple copies of the struct value
+// must not be used.
 func MakeUint64(initial uint64) Uint64 {
 	return Uint64{
-		Waker: MakeWaker(),
 		value: initial,
+		Waker: MakeWaker(),
 	}
 }
 
-// NewUint64 threshold value.
-func NewUint64(value uint64) *Uint64 {
-	t := MakeUint64(value)
-	return &t
+// NewUint64 value in flux.
+func NewUint64(initial uint64) *Uint64 {
+	x := MakeUint64(initial)
+	return &x
 }
 
-// Value is safe to call concurrently.  The value may have wrapped around since
-// previous call.
-func (t *Uint64) Value() uint64 {
-	return atomic.LoadUint64(&t.value)
-}
-
-// ValueNonatomic is a racy version of Value.
-func (t *Uint64) ValueNonatomic() uint64 {
-	return t.value
+// Value takes a snapshot.  The value may have wrapped around (multiple times)
+// since previous call.
+func (x *Uint64) Value() uint64 {
+	return atomic.LoadUint64(&x.value)
 }
 
 // Increment the value and possibly notify the observer.  The value may wrap
 // around.
-func (t *Uint64) Increment(i uint64) {
-	atomic.AddUint64(&t.value, i)
-	t.Poke()
+func (x *Uint64) Increment(i uint64) {
+	atomic.AddUint64(&x.value, i)
+	x.Poke()
 }

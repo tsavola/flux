@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package threshold
+package flux
 
 // Waker coalesces notifications.
 type Waker struct {
@@ -15,19 +15,19 @@ func MakeWaker() Waker {
 }
 
 // Chan is unblocked when it's time to wake up.  It is closed at Finish.
-func (p Waker) Chan() <-chan struct{} {
-	return p.c
+func (w Waker) Chan() <-chan struct{} {
+	return w.c
 }
 
 // Poke the observer to wake it up, unless a wake-up is already pending.
-func (p Waker) Poke() {
+func (w Waker) Poke() {
 	select {
-	case p.c <- struct{}{}:
+	case w.c <- struct{}{}:
 	default:
 	}
 }
 
 // Finish wakes up the observer for the last time.  Chan will be closed.
-func (p Waker) Finish() {
-	close(p.c)
+func (w Waker) Finish() {
+	close(w.c)
 }

@@ -1,3 +1,3 @@
-module github.com/tsavola/threshold
+module import.name/flux
 
-go 1.16
+go 1.19
